@@ -1,0 +1,51 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+spring:
+  application:
+    name: ephemeral-anonymous-chat-backend
+  threads:
+    virtual:
+      enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    root: INFO
+    com.example.chatbackend: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.springframework.web.socket: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+
+app:
+  encryption:
+    enabled: true
+  message:
+    expiry-scan-interval-ms: 1000
+  messaging:
+    max-messages-per-session-per-second: 10
+    typing-debounce-ms: 500
+  security:
+    join-token-ttl-seconds: 120
+    max-join-attempts-per-ip-per-minute: 30
+  session:
+    cleanup-interval-ms: 30000
+    max-active-sessions: 10000
+  rate-limiting:
+    enabled: false
+    requests-per-minute: 60
+    burst-capacity: 20

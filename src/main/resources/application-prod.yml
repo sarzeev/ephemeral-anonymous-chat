@@ -1,0 +1,20 @@
+logging:
+  level:
+    root: WARN
+    com.example.chatbackend: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.springframework.web.socket: WARN
+
+server:
+  shutdown: graceful
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+management:
+  endpoint:
+    health:
+      show-details: never
+

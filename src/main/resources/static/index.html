@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ephemeral Anonymous Chat Terminal</title>
+    <link rel="stylesheet" href="/chat.css">
+</head>
+<body>
+<canvas id="matrix-rain" aria-hidden="true"></canvas>
+
+<main class="terminal-shell">
+    <header class="terminal-header">
+        <div class="brand">EPHEMERAL://ANON-CHAT</div>
+        <div class="status-line">
+            <span class="status-label">STATUS</span>
+            <span id="connection-status" class="status-value status-offline">OFFLINE</span>
+        </div>
+    </header>
+
+    <section class="terminal-panel controls-panel">
+        <div class="panel-title">CONNECTION</div>
+        <form id="connect-form" class="terminal-form">
+            <label class="terminal-field">
+                <span>TEMP USER ID</span>
+                <input id="temp-user-id" name="tempUserId" type="text" autocomplete="off" spellcheck="false" required>
+            </label>
+            <label class="terminal-field">
+                <span>JOIN TOKEN</span>
+                <input id="join-token" name="joinToken" type="password" autocomplete="off" spellcheck="false" required>
+            </label>
+            <label class="terminal-field">
+                <span>SESSION ID</span>
+                <input id="session-id" name="sessionId" type="text" autocomplete="off" spellcheck="false" placeholder="auto-filled after pairing">
+            </label>
+            <div class="terminal-actions">
+                <button id="connect-button" type="submit">CONNECT</button>
+                <button id="disconnect-button" type="button">DISCONNECT</button>
+            </div>
+        </form>
+        <p class="terminal-note">Use issued bootstrap credentials. Session id and encryption key arrive after pairing, and messages vanish locally at their server-provided expiry timestamp.</p>
+    </section>
+
+    <section class="terminal-panel chat-panel">
+        <div class="panel-title">SESSION STREAM</div>
+        <div id="message-log" class="message-log" aria-live="polite"></div>
+        <div id="typing-indicator" class="typing-indicator" hidden>
+            remote user typing<span class="terminal-cursor"></span>
+        </div>
+    </section>
+
+    <section class="terminal-panel composer-panel">
+        <div class="panel-title">TRANSMIT</div>
+        <form id="message-form" class="composer-form">
+            <label class="sr-only" for="message-input">Message</label>
+            <input id="message-input" class="message-input" type="text" autocomplete="off" spellcheck="false" maxlength="500" placeholder="type message..." required>
+            <button id="send-button" type="submit">SEND</button>
+        </form>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.1.1/bundles/stomp.umd.min.js"></script>
+<script src="/chat.js" defer></script>
+</body>
+</html>
