@@ -45,13 +45,13 @@ Users are identified through temporary session identities with secure handshake 
 
 ## 🏗 Architecture Overview
 Matrix Terminal UI
-↓
+->
 WebSocket Gateway (STOMP)
-↓
+->
 Session Manager (Ephemeral Identity Engine)
-↓
+->
 Message Lifecycle Manager
-↓
+->
 Expiry Scheduler (In-Memory)
 
 ---
