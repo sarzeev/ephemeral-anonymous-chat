@@ -107,6 +107,52 @@ body {
     gap: 0.9rem;
 }
 
+.controls-panel {
+    padding: 0;
+    align-self: start;
+}
+
+.controls-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    list-style: none;
+    cursor: pointer;
+    padding: 0.9rem 1rem;
+}
+
+.controls-summary::-webkit-details-marker {
+    display: none;
+}
+
+.controls-summary::before {
+    content: ">";
+    color: var(--accent);
+    transition: transform 0.16s ease;
+}
+
+.controls-panel[open] .controls-summary::before {
+    transform: rotate(90deg);
+}
+
+.summary-meta {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    letter-spacing: 0.04rem;
+}
+
+.summary-meta strong {
+    color: var(--text-bright);
+    font-weight: 500;
+}
+
+.controls-content {
+    display: grid;
+    gap: 0.9rem;
+    padding: 0 1rem 1rem;
+    border-top: 1px solid rgba(63, 255, 63, 0.14);
+}
+
 .terminal-form,
 .composer-form {
     display: grid;
@@ -171,6 +217,7 @@ button:disabled {
     display: grid;
     grid-template-rows: auto 1fr auto;
     gap: 0.8rem;
+    padding-bottom: 0.8rem;
 }
 
 .message-log {
@@ -263,6 +310,11 @@ button:disabled {
 
     .terminal-actions {
         flex-direction: column;
+    }
+
+    .controls-summary {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .message-line {

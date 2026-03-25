@@ -10,6 +10,9 @@
     const tempUserIdInput = document.getElementById("temp-user-id");
     const joinTokenInput = document.getElementById("join-token");
     const sessionIdInput = document.getElementById("session-id");
+    const controlsPanel = document.getElementById("controls-panel");
+    const summaryUser = document.getElementById("summary-user");
+    const summarySession = document.getElementById("summary-session");
 
     const state = {
         client: null,
@@ -30,6 +33,11 @@
     function setStatus(status, text) {
         statusElement.textContent = text;
         statusElement.className = "status-value " + status;
+    }
+
+    function updateSummary() {
+        summaryUser.textContent = state.tempUserId || "idle";
+        summarySession.textContent = state.sessionId || "pending";
     }
 
     function escapeHtml(value) {
@@ -170,6 +178,8 @@
             state.sessionKey = payload.sessionKey || null;
             state.encryptionEnabled = Boolean(payload.encryptionEnabled);
             sessionIdInput.value = payload.sessionId;
+            updateSummary();
+            controlsPanel.open = false;
             subscribeToSession(payload.sessionId);
             appendSystemLine(state.encryptionEnabled ? "session key received" : "development relay mode active");
         });
@@ -231,6 +241,7 @@
 
         state.tempUserId = bootstrapResult.credentials.tempUserId;
         state.sessionId = sessionId || null;
+        updateSummary();
         state.client = buildClient(bootstrapResult.credentials.tempUserId, bootstrapResult.credentials.joinToken);
         setStatus("status-connecting", "CONNECTING");
         state.client.activate();
@@ -247,6 +258,7 @@
         state.sessionReady = false;
         state.sessionKey = null;
         state.encryptionEnabled = false;
+        updateSummary();
         setStatus("status-offline", "OFFLINE");
         connectButton.disabled = false;
     }
@@ -467,5 +479,6 @@
 
     startExpirySweep();
     initMatrixRain();
+    updateSummary();
     appendSystemLine("terminal ready");
 })();

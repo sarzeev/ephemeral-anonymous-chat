@@ -18,28 +18,34 @@
         </div>
     </header>
 
-    <section class="terminal-panel controls-panel">
-        <div class="panel-title">CONNECTION</div>
-        <form id="connect-form" class="terminal-form">
-            <label class="terminal-field">
-                <span>CHAT ID</span>
-                <input id="temp-user-id" name="tempUserId" type="text" autocomplete="off" spellcheck="false" maxlength="8" placeholder="3-8 letters or numbers" required>
-            </label>
-            <label class="terminal-field">
-                <span>JOIN CODE</span>
-                <input id="join-token" name="joinToken" type="password" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="8" placeholder="4-8 digits" required>
-            </label>
-            <label class="terminal-field">
-                <span>SESSION ID</span>
-                <input id="session-id" name="sessionId" type="text" autocomplete="off" spellcheck="false" placeholder="auto-filled after pairing">
-            </label>
-            <div class="terminal-actions">
-                <button id="connect-button" type="submit">CONNECT</button>
-                <button id="disconnect-button" type="button">DISCONNECT</button>
-            </div>
-        </form>
-        <p class="terminal-note">Pick a short chat id and join code. The client bootstraps the session automatically, then waits for pairing and key delivery in the background.</p>
-    </section>
+    <details class="terminal-panel controls-panel" id="controls-panel">
+        <summary class="controls-summary">
+            <span class="panel-title">CONNECTION CONTROLS</span>
+            <span class="summary-meta">id: <strong id="summary-user">idle</strong></span>
+            <span class="summary-meta">session: <strong id="summary-session">pending</strong></span>
+        </summary>
+        <div class="controls-content">
+            <form id="connect-form" class="terminal-form">
+                <label class="terminal-field">
+                    <span>CHAT ID</span>
+                    <input id="temp-user-id" name="tempUserId" type="text" autocomplete="off" spellcheck="false" maxlength="8" placeholder="3-8 letters or numbers" required>
+                </label>
+                <label class="terminal-field">
+                    <span>JOIN CODE</span>
+                    <input id="join-token" name="joinToken" type="password" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="8" placeholder="4-8 digits" required>
+                </label>
+                <label class="terminal-field">
+                    <span>SESSION ID</span>
+                    <input id="session-id" name="sessionId" type="text" autocomplete="off" spellcheck="false" placeholder="auto-filled after pairing">
+                </label>
+                <div class="terminal-actions">
+                    <button id="connect-button" type="submit">CONNECT</button>
+                    <button id="disconnect-button" type="button">DISCONNECT</button>
+                </div>
+            </form>
+            <p class="terminal-note">Pick a short chat id and join code. Open this panel only when you need to change connection details.</p>
+        </div>
+    </details>
 
     <section class="terminal-panel chat-panel">
         <div class="panel-title">SESSION STREAM</div>
