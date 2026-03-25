@@ -2,12 +2,15 @@ package com.example.chatbackend.controller;
 
 import com.example.chatbackend.config.SecurityHardeningProperties;
 import com.example.chatbackend.model.JoinCredentials;
+import com.example.chatbackend.model.SessionBootstrapRequest;
 import com.example.chatbackend.security.IpJoinAttemptRateLimiter;
 import com.example.chatbackend.security.JoinTokenService;
 import com.example.chatbackend.session.AnonymousSessionManager;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +37,10 @@ public class SessionBootstrapController {
     }
 
     @PostMapping("/bootstrap")
-    public ResponseEntity<JoinCredentials> bootstrapSession(HttpServletRequest request) {
+    public ResponseEntity<JoinCredentials> bootstrapSession(
+            @Valid @RequestBody SessionBootstrapRequest bootstrapRequest,
+            HttpServletRequest request
+    ) {
         String ipAddress = resolveIpAddress(request);
         if (!ipJoinAttemptRateLimiter.allowAttempt(
                 ipAddress,
@@ -43,7 +49,15 @@ public class SessionBootstrapController {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }
 
-        JoinCredentials credentials = joinTokenService.issueJoinCredentials();
+        if (!anonymousSessionManager.isTempUserAvailable(bootstrapRequest.tempUserId())
+                || joinTokenService.hasPendingAuthorization(bootstrapRequest.tempUserId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        JoinCredentials credentials = joinTokenService.issueJoinCredentials(
+                bootstrapRequest.tempUserId(),
+                bootstrapRequest.joinToken()
+        );
         anonymousSessionManager.registerIssuedTempUser(
                 credentials.tempUserId(),
                 joinTokenService.hashJoinToken(credentials.joinToken())

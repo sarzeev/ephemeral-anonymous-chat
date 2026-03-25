@@ -208,23 +208,33 @@
         });
     }
 
-    function connect(event) {
+    async function connect(event) {
         event.preventDefault();
 
         const tempUserId = tempUserIdInput.value.trim();
         const joinToken = joinTokenInput.value.trim();
         const sessionId = sessionIdInput.value.trim();
-        if (!tempUserId || !joinToken) {
-            appendSystemLine("temp user id and join token are required");
+        if (!isValidTempUserId(tempUserId) || !isValidJoinToken(joinToken)) {
+            appendSystemLine("chat id must be 3-8 letters or numbers, and join code must be 4-8 digits");
             return;
         }
 
         disconnect();
-        state.tempUserId = tempUserId;
+        connectButton.disabled = true;
+        appendSystemLine("bootstrapping session...");
+
+        const bootstrapResult = await bootstrapSession(tempUserId, joinToken);
+        if (!bootstrapResult.ok) {
+            connectButton.disabled = false;
+            return;
+        }
+
+        state.tempUserId = bootstrapResult.credentials.tempUserId;
         state.sessionId = sessionId || null;
-        state.client = buildClient(tempUserId, joinToken);
+        state.client = buildClient(bootstrapResult.credentials.tempUserId, bootstrapResult.credentials.joinToken);
         setStatus("status-connecting", "CONNECTING");
         state.client.activate();
+        connectButton.disabled = false;
     }
 
     function disconnect() {
@@ -238,6 +248,7 @@
         state.sessionKey = null;
         state.encryptionEnabled = false;
         setStatus("status-offline", "OFFLINE");
+        connectButton.disabled = false;
     }
 
     async function sendMessage(event) {
@@ -351,6 +362,50 @@
 
     function resolveWsProtocol() {
         return window.location.protocol === "https:" ? "wss" : "ws";
+    }
+
+    async function bootstrapSession(tempUserId, joinToken) {
+        try {
+            const response = await fetch("/api/session/bootstrap", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    tempUserId,
+                    joinToken
+                })
+            });
+
+            if (response.status === 409) {
+                appendSystemLine("chat id already active, choose another one");
+                return { ok: false };
+            }
+
+            if (response.status === 429) {
+                appendSystemLine("too many join attempts, slow down and retry");
+                return { ok: false };
+            }
+
+            if (!response.ok) {
+                appendSystemLine("bootstrap rejected, check chat id and join code format");
+                return { ok: false };
+            }
+
+            const credentials = await response.json();
+            return { ok: true, credentials };
+        } catch (error) {
+            appendSystemLine("bootstrap failed, network unavailable");
+            return { ok: false };
+        }
+    }
+
+    function isValidTempUserId(value) {
+        return /^[A-Za-z0-9]{3,8}$/.test(value);
+    }
+
+    function isValidJoinToken(value) {
+        return /^\d{4,8}$/.test(value);
     }
 
     function startExpirySweep() {

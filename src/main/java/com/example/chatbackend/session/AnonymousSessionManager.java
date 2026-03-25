@@ -73,6 +73,12 @@ public class AnonymousSessionManager {
         return createTempUser(tempUserId, joinTokenHash, null);
     }
 
+    public boolean isTempUserAvailable(String tempUserId) {
+        synchronized (monitor) {
+            return !activeTempUsers.containsKey(tempUserId);
+        }
+    }
+
     public TempUser attachWebSocketToTempUser(String tempUserId, String joinTokenHash, String websocketSessionId) {
         Instant now = Instant.now();
 

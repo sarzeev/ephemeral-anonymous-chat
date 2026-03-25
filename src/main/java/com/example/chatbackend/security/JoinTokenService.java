@@ -3,10 +3,7 @@ package com.example.chatbackend.security;
 import com.example.chatbackend.config.SecurityHardeningProperties;
 import com.example.chatbackend.model.JoinCredentials;
 import com.example.chatbackend.util.MessageHashingUtil;
-import com.example.chatbackend.util.TemporaryIdGenerator;
-import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -15,7 +12,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class JoinTokenService {
 
-    private final SecureRandom secureRandom = new SecureRandom();
     private final SecurityHardeningProperties securityHardeningProperties;
     private final ConcurrentMap<String, PendingJoinAuthorization> pendingJoinAuthorizations = new ConcurrentHashMap<>();
 
@@ -23,9 +19,7 @@ public class JoinTokenService {
         this.securityHardeningProperties = securityHardeningProperties;
     }
 
-    public JoinCredentials issueJoinCredentials() {
-        String tempUserId = TemporaryIdGenerator.generate();
-        String joinToken = generateSecureToken();
+    public JoinCredentials issueJoinCredentials(String tempUserId, String joinToken) {
         Instant expiresAt = Instant.now().plusSeconds(securityHardeningProperties.getJoinTokenTtlSeconds());
 
         pendingJoinAuthorizations.put(tempUserId, new PendingJoinAuthorization(
@@ -51,12 +45,6 @@ public class JoinTokenService {
         return Optional.of(new ValidatedJoinToken(authorization.tempUserId(), authorization.joinTokenHash()));
     }
 
-    private String generateSecureToken() {
-        byte[] bytes = new byte[32];
-        secureRandom.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
     private record PendingJoinAuthorization(
             String tempUserId,
             String joinTokenHash,
@@ -69,5 +57,19 @@ public class JoinTokenService {
 
     public String hashJoinToken(String joinToken) {
         return MessageHashingUtil.sha256(joinToken);
+    }
+
+    public boolean hasPendingAuthorization(String tempUserId) {
+        PendingJoinAuthorization authorization = pendingJoinAuthorizations.get(tempUserId);
+        if (authorization == null) {
+            return false;
+        }
+
+        if (authorization.expiresAt().isBefore(Instant.now())) {
+            pendingJoinAuthorizations.remove(tempUserId, authorization);
+            return false;
+        }
+
+        return true;
     }
 }
