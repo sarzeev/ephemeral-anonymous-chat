@@ -1,4 +1,5 @@
 (function () {
+    const body = document.body;
     const statusElement = document.getElementById("connection-status");
     const messageLog = document.getElementById("message-log");
     const typingIndicator = document.getElementById("typing-indicator");
@@ -13,6 +14,14 @@
     const controlsPanel = document.getElementById("controls-panel");
     const summaryUser = document.getElementById("summary-user");
     const summarySession = document.getElementById("summary-session");
+    const introGateway = document.getElementById("intro-gateway");
+    const introTitle = document.getElementById("intro-title");
+    const introLetters = Array.from(introTitle ? introTitle.querySelectorAll("[data-letter]") : []);
+    const introTagline = document.getElementById("intro-tagline");
+    const ethicalModal = document.getElementById("ethical-modal");
+    const ethicalAgreement = document.getElementById("ethical-agreement");
+    const enterButton = document.getElementById("enter-xyron");
+    const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const state = {
         client: null,
@@ -27,8 +36,151 @@
         typingSentAt: 0,
         messageElementsById: new Map(),
         expiryIndex: [],
-        expirySweepHandle: null
+        expirySweepHandle: null,
+        introComplete: false,
+        introReadyForEntry: false,
+        introDismissed: false,
+        introModalVisible: false
     };
+
+    const INTRO_SESSION_KEY = "xyron-intro-seen";
+    const SCRAMBLE_GLYPHS = "XYZRON01<>[]{}$#*+-/";
+
+    function setGatewayVisible(isVisible) {
+        body.classList.toggle("gateway-active", isVisible);
+        if (!introGateway) {
+            return;
+        }
+
+        if (isVisible) {
+            introGateway.hidden = false;
+            introGateway.classList.remove("is-exiting");
+        }
+    }
+
+    function finishGatewayEntry() {
+        if (!introGateway || state.introDismissed || !state.introReadyForEntry || !ethicalAgreement.checked) {
+            return;
+        }
+
+        state.introDismissed = true;
+        document.removeEventListener("keydown", onGatewayKeydown);
+        sessionStorage.setItem(INTRO_SESSION_KEY, "1");
+        introGateway.classList.add("is-exiting");
+        window.setTimeout(() => {
+            introGateway.hidden = true;
+            setGatewayVisible(false);
+            tempUserIdInput.focus();
+        }, reduceMotionQuery.matches ? 0 : 560);
+    }
+
+    function onGatewayKeydown(event) {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        if (!state.introReadyForEntry) {
+            return;
+        }
+
+        event.preventDefault();
+        finishGatewayEntry();
+    }
+
+    function revealEthicalModal() {
+        if (!ethicalModal || state.introModalVisible) {
+            return;
+        }
+
+        state.introModalVisible = true;
+        state.introReadyForEntry = true;
+        ethicalModal.hidden = false;
+        ethicalAgreement.focus();
+    }
+
+    function revealTaglineAndModal() {
+        if (!introTagline) {
+            revealEthicalModal();
+            return;
+        }
+
+        introTagline.classList.add("is-visible");
+        window.setTimeout(revealEthicalModal, reduceMotionQuery.matches ? 0 : 1000);
+    }
+
+    function resolveLetterSequentially(letterElement, targetCharacter, duration, delay) {
+        if (!letterElement) {
+            return;
+        }
+
+        if (reduceMotionQuery.matches) {
+            window.setTimeout(() => {
+                letterElement.textContent = targetCharacter;
+                letterElement.classList.add("is-resolved");
+            }, delay);
+            return;
+        }
+
+        window.setTimeout(() => {
+            const startedAt = performance.now();
+            const scrambleHandle = window.setInterval(() => {
+                const elapsed = performance.now() - startedAt;
+                if (elapsed >= duration) {
+                    window.clearInterval(scrambleHandle);
+                    letterElement.textContent = targetCharacter;
+                    letterElement.classList.add("is-resolved");
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * SCRAMBLE_GLYPHS.length);
+                letterElement.textContent = SCRAMBLE_GLYPHS[randomIndex];
+            }, 34);
+        }, delay);
+    }
+
+    function runGatewaySequence() {
+        if (!introGateway) {
+            return;
+        }
+
+        const introAlreadySeen = sessionStorage.getItem(INTRO_SESSION_KEY) === "1";
+        if (introAlreadySeen) {
+            introGateway.hidden = true;
+            setGatewayVisible(false);
+            state.introDismissed = true;
+            state.introComplete = true;
+            return;
+        }
+
+        setGatewayVisible(true);
+        document.addEventListener("keydown", onGatewayKeydown);
+
+        if (reduceMotionQuery.matches) {
+            introLetters.forEach((letterElement) => {
+                letterElement.textContent = letterElement.dataset.letter;
+                letterElement.classList.add("is-resolved");
+            });
+            introTagline.classList.add("is-visible");
+            revealEthicalModal();
+            state.introComplete = true;
+            return;
+        }
+
+        introTitle.classList.add("is-flickering");
+        const totalDuration = 2000;
+        const perLetterDuration = 330;
+        const perLetterDelay = Math.floor((totalDuration - perLetterDuration) / Math.max(1, introLetters.length - 1));
+
+        introLetters.forEach((letterElement, index) => {
+            resolveLetterSequentially(letterElement, letterElement.dataset.letter, perLetterDuration, index * perLetterDelay);
+        });
+
+        window.setTimeout(() => {
+            introTitle.classList.remove("is-flickering");
+            state.introComplete = true;
+            revealTaglineAndModal();
+        }, totalDuration + 120);
+    }
 
     function setStatus(status, text) {
         statusElement.textContent = text;
@@ -476,9 +628,26 @@
     disconnectButton.addEventListener("click", disconnect);
     messageForm.addEventListener("submit", sendMessage);
     messageInput.addEventListener("input", sendTypingEvent, { passive: true });
+    ethicalAgreement.addEventListener("change", () => {
+        enterButton.disabled = !ethicalAgreement.checked;
+    });
+    enterButton.addEventListener("click", finishGatewayEntry);
+    introGateway.addEventListener("click", (event) => {
+        if (!state.introReadyForEntry || !ethicalAgreement.checked) {
+            return;
+        }
+
+        const interactiveTarget = event.target.closest("button, input, label");
+        if (interactiveTarget && interactiveTarget !== enterButton) {
+            return;
+        }
+
+        finishGatewayEntry();
+    });
 
     startExpirySweep();
     initMatrixRain();
+    runGatewaySequence();
     updateSummary();
     appendSystemLine("terminal ready");
 })();

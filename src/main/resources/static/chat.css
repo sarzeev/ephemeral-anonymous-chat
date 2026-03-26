@@ -28,6 +28,11 @@ body {
     overflow: hidden;
 }
 
+body.gateway-active .terminal-shell {
+    opacity: 0;
+    pointer-events: none;
+}
+
 #matrix-rain {
     position: fixed;
     inset: 0;
@@ -35,6 +40,144 @@ body {
     height: 100%;
     opacity: 0.22;
     pointer-events: none;
+}
+
+.intro-gateway {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background:
+        radial-gradient(circle at top, rgba(57, 255, 114, 0.08), transparent 38%),
+        linear-gradient(180deg, rgba(0, 10, 0, 0.16), rgba(0, 0, 0, 0.78));
+    transition: opacity 0.55s ease, visibility 0.55s ease;
+}
+
+.intro-gateway.is-exiting {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.intro-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(57, 255, 114, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 114, 0.05) 1px, transparent 1px);
+    background-size: 100% 2.6rem, 2.6rem 100%;
+    mask-image: radial-gradient(circle at center, black 45%, transparent 85%);
+    opacity: 0.22;
+    pointer-events: none;
+}
+
+.intro-core {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    text-align: center;
+}
+
+.intro-kicker,
+.modal-kicker {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    letter-spacing: 0.3rem;
+    text-transform: uppercase;
+}
+
+.intro-title {
+    margin: 0;
+    display: flex;
+    gap: 0.18em;
+    font-size: clamp(3rem, 10vw, 6.4rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-bright);
+    text-shadow: 0 0 22px rgba(57, 255, 114, 0.22), 0 0 45px rgba(57, 255, 114, 0.12);
+}
+
+.intro-title span {
+    min-width: 0.72em;
+    opacity: 0.22;
+    filter: blur(0.6px);
+    transition: opacity 0.2s ease, filter 0.2s ease, text-shadow 0.2s ease;
+}
+
+.intro-title span.is-resolved {
+    opacity: 1;
+    filter: none;
+    text-shadow: 0 0 12px rgba(57, 255, 114, 0.55);
+}
+
+.intro-title.is-flickering {
+    animation: intro-flicker 0.28s linear 2;
+}
+
+.intro-tagline {
+    margin: 0;
+    color: rgba(201, 255, 201, 0.58);
+    letter-spacing: 0.18rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.intro-tagline.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ethical-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.48);
+}
+
+.ethical-modal[hidden] {
+    display: none;
+}
+
+.ethical-panel {
+    width: min(100%, 34rem);
+    display: grid;
+    gap: 1rem;
+    padding: 1.35rem;
+    border: 1px solid var(--border);
+    background: rgba(0, 12, 0, 0.92);
+    box-shadow: 0 0 22px var(--shadow), inset 0 0 22px rgba(20, 80, 20, 0.16);
+}
+
+.ethical-panel h2,
+.ethical-copy {
+    margin: 0;
+}
+
+.ethical-copy {
+    color: var(--text-dim);
+    line-height: 1.65;
+}
+
+.ethical-checkbox {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    color: var(--text-bright);
+}
+
+.ethical-checkbox input {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.18rem;
+    accent-color: var(--accent);
 }
 
 .terminal-shell {
@@ -269,6 +412,25 @@ button:disabled {
     }
 }
 
+@keyframes intro-flicker {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    25% {
+        opacity: 0.78;
+    }
+
+    45% {
+        opacity: 0.96;
+    }
+
+    65% {
+        opacity: 0.82;
+    }
+}
+
 .message-input {
     min-width: 0;
 }
@@ -293,9 +455,27 @@ button:disabled {
         overflow: auto;
     }
 
+    body.gateway-active {
+        overflow: hidden;
+    }
+
     .terminal-shell {
         height: auto;
         grid-template-rows: auto auto auto 1fr auto;
+    }
+
+    .intro-title {
+        gap: 0.12em;
+        letter-spacing: 0.16em;
+    }
+
+    .intro-tagline {
+        max-width: 18rem;
+        line-height: 1.6;
+    }
+
+    .ethical-panel {
+        padding: 1.1rem;
     }
 
     .terminal-header {
@@ -323,5 +503,19 @@ button:disabled {
 
     .message-content {
         grid-column: 1 / -1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #matrix-rain,
+    .terminal-cursor,
+    .intro-title.is-flickering {
+        animation: none !important;
+    }
+
+    .intro-gateway,
+    .intro-tagline,
+    .intro-title span {
+        transition: none;
     }
 }
