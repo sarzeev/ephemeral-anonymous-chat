@@ -1,0 +1,17 @@
+{
+  "name": "XYRON Anonymous Chat",
+  "short_name": "XYRON",
+  "description": "Ephemeral anonymous chat for fast private conversations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020402",
+  "theme_color": "#020402",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

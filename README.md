@@ -129,3 +129,26 @@ Production deployment and distributed scaling in progress.
 
 Sarjeev Sharma  
 B.Tech Computer Science Engineering
+
+---
+
+## Mobile App Packaging
+
+This repo now includes a Capacitor wrapper in `mobile/` so the same chat experience can be packaged as installable Android and iOS apps.
+
+### Mobile build flow
+
+1. Deploy this backend to a public HTTPS URL.
+2. Update `mobile/web/mobile-config.js` with that deployed backend URL.
+3. In `mobile/`, run `npm install`.
+4. Run `npx cap add android` and `npx cap add ios`.
+5. Run `npx cap sync`.
+6. Open the native projects with `npm run open:android` or `npm run open:ios`.
+
+### Mobile readiness included
+
+- Isolated mobile web assets under `mobile/web`
+- Mobile-aware API and WebSocket URL resolution
+- Native WebView origin support in WebSocket configuration
+- PWA manifest and offline shell
+- Safe-area and phone-screen layout improvements

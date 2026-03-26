@@ -1,0 +1,20 @@
+{
+  "name": "xyron-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Capacitor wrapper for the XYRON anonymous chat web client.",
+  "scripts": {
+    "sync": "npx cap sync",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.1.0",
+    "@capacitor/core": "^7.1.0",
+    "@capacitor/ios": "^7.1.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.1.0",
+    "typescript": "^5.8.3"
+  }
+}

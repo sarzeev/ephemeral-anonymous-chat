@@ -35,6 +35,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws/chat")
                 .addInterceptors(handshakeInterceptor)
                 .setHandshakeHandler(handshakeHandler)
-                .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*");
+                .setAllowedOriginPatterns(
+                        "http://*",
+                        "https://*",
+                        "capacitor://localhost",
+                        "ionic://localhost"
+                );
     }
 }

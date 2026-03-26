@@ -20,6 +20,7 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/chat.css",
                                 "/chat.js",
+                                "/downloads/**",
                                 "/actuator/health",
                                 "/api/v1/system/health",
                                 "/api/session/bootstrap",
