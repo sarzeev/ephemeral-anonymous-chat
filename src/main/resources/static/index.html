@@ -3,11 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ephemeral Anonymous Chat Terminal</title>
+    <title>XYRON</title>
     <link rel="stylesheet" href="/chat.css">
 </head>
-<body>
+<body class="gateway-active">
 <canvas id="matrix-rain" aria-hidden="true"></canvas>
+
+<section id="intro-gateway" class="intro-gateway" aria-label="XYRON entry gateway">
+    <div class="intro-grid" aria-hidden="true"></div>
+    <div class="intro-core">
+        <p class="intro-kicker">secure relay handshake</p>
+        <h1 id="intro-title" class="intro-title" aria-label="XYRON">
+            <span data-letter="X">X</span>
+            <span data-letter="Y">Y</span>
+            <span data-letter="R">R</span>
+            <span data-letter="O">O</span>
+            <span data-letter="N">N</span>
+        </h1>
+        <p id="intro-tagline" class="intro-tagline">no one is watching you.</p>
+    </div>
+
+    <div id="ethical-modal" class="ethical-modal" role="dialog" aria-modal="true" aria-labelledby="ethical-title" aria-describedby="ethical-copy" hidden>
+        <div class="ethical-panel">
+            <p class="modal-kicker">access protocol</p>
+            <h2 id="ethical-title">Before You Enter</h2>
+            <p id="ethical-copy" class="ethical-copy">
+                This platform is experimental and privacy-focused. Messages are temporary. Do not use it for harassment, illegal activity, or harm. Even if no one is watching, responsibility is yours.
+            </p>
+            <label class="ethical-checkbox">
+                <input id="ethical-agreement" type="checkbox">
+                <span>I agree to use this responsibly</span>
+            </label>
+            <button id="enter-xyron" type="button" disabled>Enter XYRON</button>
+        </div>
+    </div>
+</section>
 
 <main class="terminal-shell">
     <header class="terminal-header">
