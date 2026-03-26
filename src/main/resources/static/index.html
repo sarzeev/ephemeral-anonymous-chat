@@ -56,24 +56,26 @@
         </summary>
         <div class="controls-content">
             <form id="connect-form" class="terminal-form">
-                <label class="terminal-field">
-                    <span>CHAT ID</span>
-                    <input id="temp-user-id" name="tempUserId" type="text" autocomplete="off" spellcheck="false" maxlength="8" placeholder="3-8 letters or numbers" required>
-                </label>
-                <label class="terminal-field">
-                    <span>JOIN CODE</span>
-                    <input id="join-token" name="joinToken" type="password" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="8" placeholder="4-8 digits" required>
-                </label>
-                <label class="terminal-field">
-                    <span>SESSION ID</span>
-                    <input id="session-id" name="sessionId" type="text" autocomplete="off" spellcheck="false" placeholder="auto-filled after pairing">
-                </label>
+                <div class="credential-grid">
+                    <label class="terminal-field">
+                        <span>CHAT ID</span>
+                        <input id="temp-user-id" name="tempUserId" type="text" autocomplete="off" spellcheck="false" maxlength="8" placeholder="make your chat id" required>
+                    </label>
+                    <label class="terminal-field">
+                        <span>JOIN TOKEN</span>
+                        <input id="join-token" name="joinToken" type="password" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="8" placeholder="same token as your friend" required>
+                    </label>
+                </div>
+                <input id="session-id" name="sessionId" type="hidden">
+                <p class="terminal-instruction">
+                    Make a chat id and a join token here. The join token should exactly match the one your friend uses. You do not need to enter any session id because bootstrap creates it automatically.
+                </p>
                 <div class="terminal-actions">
                     <button id="connect-button" type="submit">CONNECT</button>
                     <button id="disconnect-button" type="button">DISCONNECT</button>
                 </div>
             </form>
-            <p class="terminal-note">Pick a short chat id and join code. Open this panel only when you need to change connection details.</p>
+            <p class="terminal-note">Pick a short chat id and matching join token, then connect when both sides are ready.</p>
         </div>
     </details>
 

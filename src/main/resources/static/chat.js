@@ -116,18 +116,21 @@
         if (reduceMotionQuery.matches) {
             window.setTimeout(() => {
                 letterElement.textContent = targetCharacter;
+                letterElement.classList.add("is-revealing");
                 letterElement.classList.add("is-resolved");
             }, delay);
             return;
         }
 
         window.setTimeout(() => {
+            letterElement.classList.add("is-revealing");
             const startedAt = performance.now();
             const scrambleHandle = window.setInterval(() => {
                 const elapsed = performance.now() - startedAt;
                 if (elapsed >= duration) {
                     window.clearInterval(scrambleHandle);
                     letterElement.textContent = targetCharacter;
+                    letterElement.classList.remove("is-revealing");
                     letterElement.classList.add("is-resolved");
                     return;
                 }
@@ -158,6 +161,7 @@
         if (reduceMotionQuery.matches) {
             introLetters.forEach((letterElement) => {
                 letterElement.textContent = letterElement.dataset.letter;
+                letterElement.classList.add("is-revealing");
                 letterElement.classList.add("is-resolved");
             });
             introTagline.classList.add("is-visible");
@@ -190,6 +194,20 @@
     function updateSummary() {
         summaryUser.textContent = state.tempUserId || "idle";
         summarySession.textContent = state.sessionId || "pending";
+    }
+
+    function hasConnectionCredentials() {
+        return tempUserIdInput.value.trim().length > 0 && joinTokenInput.value.trim().length > 0;
+    }
+
+    function syncControlsPanelState() {
+        if (!controlsPanel) {
+            return;
+        }
+
+        if (!hasConnectionCredentials()) {
+            controlsPanel.open = true;
+        }
     }
 
     function escapeHtml(value) {
@@ -628,6 +646,13 @@
     disconnectButton.addEventListener("click", disconnect);
     messageForm.addEventListener("submit", sendMessage);
     messageInput.addEventListener("input", sendTypingEvent, { passive: true });
+    tempUserIdInput.addEventListener("input", syncControlsPanelState, { passive: true });
+    joinTokenInput.addEventListener("input", syncControlsPanelState, { passive: true });
+    controlsPanel.addEventListener("toggle", () => {
+        if (!controlsPanel.open) {
+            syncControlsPanelState();
+        }
+    });
     ethicalAgreement.addEventListener("change", () => {
         enterButton.disabled = !ethicalAgreement.checked;
     });
@@ -648,6 +673,7 @@
     startExpirySweep();
     initMatrixRain();
     runGatewaySequence();
+    syncControlsPanelState();
     updateSummary();
     appendSystemLine("terminal ready");
 })();
